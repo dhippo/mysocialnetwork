@@ -1,6 +1,8 @@
 <?php
 session_start();
 
+//test
+
 /** DATABASE */
 require_once 'app/models/Database.php';
 $pdo = new Database();
