@@ -1,7 +1,7 @@
 <?php
 session_start();
 
-//test
+//test2
 
 /** DATABASE */
 require_once 'app/models/Database.php';
