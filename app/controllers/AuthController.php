@@ -30,13 +30,10 @@ class AuthController
             $password = $_POST['password'];
             $promo = $_POST['promo'];
             $statut = $_POST['statut'];
-            $bio = $_POST['bio'];
             $birth_date = $_POST['birth_date'];
-            $profile_picture = $_POST['profile_picture'];
-            $interests = $_POST['interests'];
 
             // Inscription de l'utilisateur
-            $result = $this->userModel->register($email, $first_name, $last_name, $password, $promo, $statut, $bio, $birth_date, $profile_picture, $interests);
+            $result = $this->userModel->register($email, $first_name, $last_name, $password, $promo, $statut, $birth_date);
             if ($result) {
                 // Rediriger vers la page de connexion
                 $params = array('page' => 'login');
