@@ -51,7 +51,7 @@ if (!$authController->isLoggedIn() && !in_array($requestedPage, ['login', 'regis
 // condition pour afficher le header: ne pas être sur la page de connexion ou d'inscription ou $_GET['page'] non défini
 if (!in_array($requestedPage, ['login', 'register'])) {
     if(isset($_GET['page'])){
-       require_once 'app/views/layouts/header.php';
+       //require_once 'app/views/layouts/header.php';
     }
 }
 
@@ -66,6 +66,7 @@ switch ($requestedPage) {
         $authController->registerController();
         require_once 'app/views/auth/register.php';
         break;
+
     case 'home':
         $publicPosts = $postController->displayAllPublicPosts();
         require_once 'app/views/home.php';
@@ -80,6 +81,22 @@ switch ($requestedPage) {
         $userPosts = $postController->postsCurrentUser($id_user);
 
         require_once 'app/views/profiles/my_profile.php';
+        break;
+    case 'user_profile':
+        if (isset($_GET['email_user_to_see']) && !empty($_GET['email_user_to_see'])) {
+            $email_user_to_see = $_GET['email_user_to_see'];
+
+            $userModel = new User($pdo_connection);
+            $id_user_to_see = $userModel->getIdByEmail($email_user_to_see);
+            $userPosts = $postController->postsCurrentUser($id_user_to_see);
+
+
+            $userProfileInfo = $userController->getUserProfileByEmail($email_user_to_see);
+            $userProfileId = $userController->getUserIdByEmail($email_user_to_see);
+            require_once 'app/views/profiles/user_profile.php';
+        } else {
+            header('Location: ?page=home');
+        }
         break;
     case 'modif_profile':
         $user_id = $_SESSION['id_user'];
@@ -124,9 +141,11 @@ switch ($requestedPage) {
 
         if (isset($_GET['id_post']) && !empty($_GET['id_post'])) {
             $id_post = $_GET['id_post'];
+
             $postInfo = $postController->displayPostDetails($id_post);
+            $old_image = $postInfo['image'];
             if (isset($_POST['submit'])) {
-                if ($postController->updatePostController($id_post, $_POST, $_FILES)) {
+                if ($postController->updatePostController($id_post, $_POST, $_FILES, $old_image)) {
                     header('Location: ?page=home');
                     exit();
                 } else {
@@ -138,20 +157,40 @@ switch ($requestedPage) {
             var_dump($_GET['id_post']);
         }
         break;
-    case 'user_profile':
-        if (isset($_GET['email_user_to_see']) && !empty($_GET['email_user_to_see'])) {
-            $email_user_to_see = $_GET['email_user_to_see'];
-            $userProfileInfo = $userController->getUserProfileByEmail($email_user_to_see);
-            $userProfileId = $userController->getUserIdByEmail($email_user_to_see);
-            require_once 'app/views/profiles/user_profile.php';
+    case 'add_like':
+        if (isset($_GET['id_post']) && !empty($_GET['id_post'])) {
+            $id_post = $_GET['id_post'];
+            $postDetails = $postController->displayPostDetails($id_post);
+            $postController->addLikeController($id_post);
+
+
+            require_once 'app/views/posts/show.php';
         } else {
             header('Location: ?page=home');
         }
         break;
+    case 'add_dislike':
+        if (isset($_GET['id_post']) && !empty($_GET['id_post'])) {
+            $id_post = $_GET['id_post'];
+            $postDetails = $postController->displayPostDetails($id_post);
+
+            $postController->addDislikeController($id_post);
+            require_once 'app/views/posts/show.php';
+        } else {
+            header('Location: ?page=home');
+        }
+        break;
+
     case 'all_users':
+        $id_u = $_SESSION['id_user'];
         $allUsers = $userController->displayAllUsers();
         require_once 'app/views/relations/all_users.php';
         break;
+    case 'search_user':
+        $userController->searchUserController();
+        break;
+
+
     case 'ask_friend':
         $userController->addFriendController();
         break;

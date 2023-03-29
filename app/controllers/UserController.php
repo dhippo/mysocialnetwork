@@ -22,6 +22,18 @@ class UserController
     {
         return $this->userModel->displayAllUsersWithFilter($filter);
     }
+    public function displayAllUsers_SEACRH($filter)
+    {
+        return $this->userModel->displayAllUsers_SEACRH($filter);
+    }
+    public function displayFilteredUsers($search)
+    {
+        if (!empty($search)) {
+            return $this->userModel->displayAllUsers_SEACRH($search);
+        }
+        return [];
+    }
+
 
     public function getUserNameById($userId)
     {
@@ -34,6 +46,45 @@ class UserController
             'profile_picture' => $userInfo['profile_picture'],
         ];
     }
+    public function displayUserProfile($id_to)
+    {
+        return $this->userModel->getUserInformationById($id_to);
+    }
+    public function searchUserController() {
+        if (isset($_GET['users'])) {
+            $users = (string) trim($_GET['users']); //trim pour enlever espace avant et apres
+            $userId=$_GET['userId'];
+            //   $userId=24;
+
+
+            $pdo = new Database();
+            $pdo_connection = $pdo->getConnection();
+
+            $req = $pdo_connection->query("SELECT * FROM users WHERE (last_name LIKE '$users%' OR first_name LIKE '$users%')  AND id_user != '$userId' LIMIT 5;"); //limit de 5 nom
+            $result = $req->fetchAll();
+
+            foreach ($result as $r) {
+                $id_s = $r['id_user'];
+                //pour chaque discu on recupere les infos de la personne
+
+                $userController = new UserController($pdo_connection);
+
+                $user_s = $userController->displayUserProfile($id_s);
+                $avatar_s = $user_s['profile_picture'];
+                $avatar_s = '<img src="http://localhost:8888/mysocialnetwork/public/images/profile-images/' . $avatar_s . '" alt="' . $avatar_s . '">';
+                $nom_s = $user_s['last_name'];
+                $prenom_s = $user_s['first_name'];
+
+                echo '<div class="resul_search">';
+                echo '<div class="avatar_search">' . $avatar_s . '</div>';
+                echo '<div class="nom_search">';
+                echo '<a href="router.php?page=message&id_to=' . $id_s . '">' . $nom_s . ' ' . $prenom_s . '</a>';
+                echo '</div>';
+                echo '</div>';
+            }
+        }
+    }
+
     public function getUserIdByEmail($email)
     {
         return $this->userModel->getIdByEmail($email);
@@ -42,6 +93,7 @@ class UserController
     {
         return $this->userModel->getUserProfileByEmail($email);
     }
+
 
     public function displayAllUsers() {
         return $this->userModel->getAllUsers();

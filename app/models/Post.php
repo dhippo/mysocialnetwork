@@ -63,6 +63,20 @@ class Post
         return $stmt->execute([$title, $fileName, $content, $category, $visibility, $updated_at, $id_post]);
     }
 
+    public function addLike($id_post, $likes)
+    {
+        $sql = "UPDATE posts SET likes = likes + 1 WHERE id_post = :id_post";
+        $statement = $this->pdo->prepare($sql);
+        $statement->bindValue(':id_post', $id_post);
+        return $statement->execute();
+    }
+    public function addDislike($id_post, $dislikes)
+    {
+        $sql = "UPDATE posts SET dislikes = dislikes + 1 WHERE id_post = :id_post";
+        $statement = $this->pdo->prepare($sql);
+        $statement->bindValue(':id_post', $id_post);
+        return $statement->execute();
+    }
 
 
 }

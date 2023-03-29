@@ -39,33 +39,33 @@
         </div>
 
         <div class="bg-white shadow-md rounded-lg px-6 py-8 mt-10 border">
-            <div class="w-1/2 flex justify-between">
+            <div class="flex justify-between flex-col">
                 <h1 class="text-4xl font-bold mb-6">Posts de <?php echo htmlspecialchars($userProfileInfo['first_name']) . " " . htmlspecialchars($userProfileInfo['last_name']); ?></h1>
 
+                <div id="user_posts" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mx-6">
                 <?php foreach ($userPosts as $post): ?>
-                    <div class="flex justify-center m-2">
+                    <div class="m-2">
 
                         <div class="post bg-gradient-to-r w-full -p-4 from-blue-400 via-blue-500 to-blue-600 p-6 rounded-xl shadow-md border border-blue-200">
                             <div class="p-2 rounded-xl bg-white h-full w-full flex flex-col justify-between">
                                 <div class="bg-white rounded-xl p-2 m-2">
-                                    <h3 class="text-xl font-semibold text-blue-400 mb-2"><?php echo htmlspecialchars($post['title']); ?></h3>
+                                    <h3 class="text-xl font-semibold text-blue-400 mb-2 hover:underline">
+                                        <a href="?page=show_post&id_post=<?php echo $post['id_post']; ?>">
+                                            <?php echo htmlspecialchars($post['title']); ?>
+                                        </a>
+                                    </h3>
                                 </div>
                                 <img src="http://localhost:8888/mysocialnetwork/public/images/post-images/<?php echo $post['image']; ?>" alt="Post image" class="w-full h-32 object-cover mb-1 rounded-xl" />
                                 <p class="text-black mb-4"><?php echo htmlspecialchars($post['content']); ?></p>
                                 <p class="text-sm text-blue-100 mb-1"><small>Créé le: <?php echo htmlspecialchars($post['created_at']); ?></small></p>
                                 <p class="text-sm text-blue-100"><small>Catégorie: <?php echo htmlspecialchars($post['category']); ?></small></p>
-                                <div class="mt-4 flex justify-end">
-                                    <a href="?page=edit_post&id_post=<?php echo htmlspecialchars($post['id_post']); ?>">
-                                        <button class="flex flex-row bg-blue-600 text-white text-sm ml-6 rounded-xl p-2 border border-2 border-black hover:opacity-50">
-                                            <span class="mr-4">Modifier un post</span>
-                                        </button>
-                                    </a>
-                                </div>
+
                             </div>
                         </div>
                     </div>
 
                 <?php endforeach; ?>
+                </div>
 
             </div>
         </div>

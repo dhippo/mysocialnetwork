@@ -250,6 +250,25 @@ class User
         $statement->execute();
         return $statement->fetchAll(PDO::FETCH_ASSOC);
     }
+    public function displayAllUsers_SEACRH($filter)
+    {
+        $sql = "SELECT * FROM users WHERE CONCAT(first_name, ' ', last_name) LIKE :filter";
+        $stmt = $this->pdo->prepare($sql);
+        $filter = '%' . $filter . '%';
+        $stmt->bindParam(':filter', $filter, PDO::PARAM_STR);
+        $stmt->execute();
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    public function searchUsers($search)
+    {
+        $search = '%' . $search . '%';
+        $sql = "SELECT * FROM users WHERE CONCAT(first_name, ' ', last_name) LIKE ? OR email LIKE ?";
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->execute([$search, $search]);
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
 
     private function uploadProfilePicture($file)
     {
