@@ -173,7 +173,7 @@ switch ($requestedPage) {
 
         $allUsers = $userController->displayAllUsers();
         // $allUsers : résultat de "SELECT * FROM users"
-
+//test
 
         require_once 'app/views/admin/admin_validator.php';
         break;
