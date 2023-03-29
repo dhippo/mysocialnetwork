@@ -23,6 +23,7 @@ class User
             return null;
         }
     }
+
     public function getIdByEmail($friend_email) {
         $sql = "SELECT `id_user` FROM `users` WHERE `email` = :friend_email";
         $stmt = $this->pdo->prepare($sql);
@@ -125,37 +126,7 @@ class User
         return $stmt->execute();
     }
 
-    private function uploadProfilePicture($file)
-    {
-        // Vérifier si le fichier a été téléchargé sans erreur
-        if ($file['error'] != 0) {
-            return false;
-        }
 
-        // Vérifier la taille du fichier
-        if ($file['size'] > 5000000) {
-            return false;
-        }
-
-        // Vérifier le type du fichier
-        $allowedMimeTypes = ['image/jpeg', 'image/png', 'image/gif'];
-        if (!in_array($file['type'], $allowedMimeTypes)) {
-            return false;
-        }
-
-        // Générer un nom de fichier unique
-        $fileExtension = pathinfo($file['name'], PATHINFO_EXTENSION);
-        $uniqueFileName = uniqid() . '.' . $fileExtension;
-
-
-        // Déplacer le fichier téléchargé vers le dossier /public/images/profile-images
-        $destinationPath = $_SERVER['DOCUMENT_ROOT'] . '/public/images/profile-images/' . $uniqueFileName;
-
-        move_uploaded_file($file['tmp_name'], $destinationPath);
-
-        // Retourner le chemin relatif vers l'image pour l'enregistrer dans la base de données
-        return 'images/profile-images/' . $uniqueFileName;
-    }
 
     public function getUserProfileByEmail($email)
     {
@@ -268,6 +239,51 @@ class User
         }
 
     }
+
+    public function displayAllUsersWithFilter($filter)
+    {
+        $sql = "SELECT * FROM users";
+        if ($filter) {
+            $sql .= " WHERE " . $filter;
+        }
+        $statement = $this->pdo->prepare($sql);
+        $statement->execute();
+        return $statement->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    private function uploadProfilePicture($file)
+    {
+        // Vérifier si le fichier a été téléchargé sans erreur
+        if ($file['error'] != 0) {
+            return false;
+        }
+
+        // Vérifier la taille du fichier
+        if ($file['size'] > 5000000) {
+            return false;
+        }
+
+        // Vérifier le type du fichier
+        $allowedMimeTypes = ['image/jpeg', 'image/png', 'image/gif'];
+        if (!in_array($file['type'], $allowedMimeTypes)) {
+            return false;
+        }
+
+        // Générer un nom de fichier unique
+        $fileExtension = pathinfo($file['name'], PATHINFO_EXTENSION);
+        $uniqueFileName = uniqid() . '.' . $fileExtension;
+
+
+        // Déplacer le fichier téléchargé vers le dossier /public/images/profile-images
+        $destinationPath = $_SERVER['DOCUMENT_ROOT'] . '/public/images/profile-images/' . $uniqueFileName;
+
+        move_uploaded_file($file['tmp_name'], $destinationPath);
+
+        // Retourner le chemin relatif vers l'image pour l'enregistrer dans la base de données
+        return 'images/profile-images/' . $uniqueFileName;
+    }
+
+
 
 }
 

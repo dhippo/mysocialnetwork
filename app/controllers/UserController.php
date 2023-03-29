@@ -18,6 +18,10 @@ class UserController
     {
         return $this->userModel->updateUser($id, $data, $file);
     }
+    public function displayAllUsersWithFilter($filter)
+    {
+        return $this->userModel->displayAllUsersWithFilter($filter);
+    }
 
     public function getUserNameById($userId)
     {
@@ -29,6 +33,10 @@ class UserController
             'last_name' => $userInfo['last_name'],
             'profile_picture' => $userInfo['profile_picture'],
         ];
+    }
+    public function getUserIdByEmail($email)
+    {
+        return $this->userModel->getIdByEmail($email);
     }
     public function getUserProfileByEmail($email)
     {

@@ -11,6 +11,7 @@ $pdo_connection = $pdo->getConnection();
 /** MODELS */
 require_once 'app/models/User.php';
 require_once 'app/models/Post.php';
+require_once 'app/models/Admin.php';
 /** CONTROLLERS */
 /* AuthController */
 require_once 'app/controllers/AuthController.php';
@@ -21,6 +22,9 @@ $userController = new UserController($pdo_connection);
 /* PostController */
 require_once 'app/controllers/PostController.php';
 $postController = new PostController($pdo_connection);
+/* AdminController */
+require_once 'app/controllers/AdminController.php';
+$adminController = new AdminController($pdo_connection);
 
 
 $requestedPage = isset($_GET['page']) ? $_GET['page'] : 'register'; //page de base si aucun argument, si un user est connecté, il sera redirigé vers la page home
@@ -138,6 +142,7 @@ switch ($requestedPage) {
         if (isset($_GET['email_user_to_see']) && !empty($_GET['email_user_to_see'])) {
             $email_user_to_see = $_GET['email_user_to_see'];
             $userProfileInfo = $userController->getUserProfileByEmail($email_user_to_see);
+            $userProfileId = $userController->getUserIdByEmail($email_user_to_see);
             require_once 'app/views/profiles/user_profile.php';
         } else {
             header('Location: ?page=home');
@@ -170,13 +175,46 @@ switch ($requestedPage) {
         break;
 
     case 'admin_validator':
-
-        $allUsers = $userController->displayAllUsers();
-        // $allUsers : résultat de "SELECT * FROM users"
-//test
-
+        $allUsers = $userController->displayAllUsersWithFilter('');
         require_once 'app/views/admin/admin_validator.php';
         break;
+    case 'admin_all_users':
+        $allUsers = $userController->displayAllUsersWithFilter('');
+        require_once 'app/views/admin/admin_validator.php';
+        break;
+    case 'admin_new_users':
+        $filter = "is_blocked = 0 AND validated = 0";
+        $allUsers = $userController->displayAllUsersWithFilter($filter);
+        require_once 'app/views/admin/admin_validator.php';
+        break;
+    case 'admin_validated_users':
+        $filter = "is_blocked = 0 AND validated = 1";
+        $allUsers = $userController->displayAllUsersWithFilter($filter);
+        require_once 'app/views/admin/admin_validator.php';
+        break;
+    case 'admin_blocked_users':
+        $filter = "is_blocked = 1 AND validated = 0";
+        $allUsers = $userController->displayAllUsersWithFilter($filter);
+        require_once 'app/views/admin/admin_validator.php';
+        break;
+    case 'admin_suspended_users':
+        $filter = "is_blocked = 0 AND validated = 0";
+        $allUsers = $userController->displayAllUsersWithFilter($filter);
+        require_once 'app/views/admin/admin_validator.php';
+        break;
+    case 'admin_validate_user':
+        $action = $_GET['action'];
+        $idUser = $_GET['id'];
+        $adminController->validateUser($idUser, $action);
+        header('Location: http://localhost:8888/mysocialnetwork/public/index.php?page=admin_validator');
+        break;
+    case 'admin_block_user':
+        $action = $_GET['action'];
+        $idUser = $_GET['id'];
+        $adminController->blockUser($idUser, $action);
+        header('Location: http://localhost:8888/mysocialnetwork/public/index.php?page=admin_validator');
+        break;
+
 
     case 'logout':
         session_destroy();

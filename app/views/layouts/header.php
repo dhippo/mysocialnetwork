@@ -8,8 +8,8 @@ function currentPage($page) {
     <div class="hidden lg:fixed lg:inset-y-0 lg:z-50 lg:flex lg:w-72 lg:flex-col">
         <!-- Sidebar component, swap this element with another sidebar if you like -->
         <div class="flex grow flex-col gap-y-5 overflow-y-auto border-r border-gray-200 bg-white px-6 pb-4">
-            <div class="flex h-28 shrink-0 justify-center items-center">
-                <img class="h-20 w-auto rounded-xl" src="http://localhost:8888/mysocialnetwork/public/images/ece-logo.jpg" alt="ECE">
+            <div class="flex h-28 shrink-0 justify-center items-center bg-blue-600 rounded-xl mt-4">
+                <img class="h-20 w-auto rounded-xl" src="http://localhost:8888/mysocialnetwork/public/images/ece-logo.png" alt="ECE">
             </div>
             <nav class="flex flex-1 flex-col pt-2">
                 <ul role="list" class="flex flex-1 flex-col gap-y-7">
@@ -121,6 +121,7 @@ function currentPage($page) {
                 </button>
 
                 <!-- Separator -->
+
                 <div class="h-6 w-px bg-gray-200 lg:hidden" aria-hidden="true">oo</div>
 
                 <div class="flex flex-1 gap-x-4 self-stretch lg:gap-x-6">

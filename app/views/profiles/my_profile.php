@@ -46,23 +46,17 @@
         <div class="flex justify-center m-2">
 
             <div class="post bg-gradient-to-r w-full -p-4 from-blue-400 via-blue-500 to-blue-600 p-6 rounded-xl shadow-md border border-blue-200">
-                <div class="p-2 rounded-xl bg-white h-full w-full">
+                <div class="p-2 rounded-xl bg-white h-full w-full flex flex-col justify-between">
                     <div class="bg-white rounded-xl p-2 m-2">
                         <h3 class="text-xl font-semibold text-blue-400 mb-2"><?php echo htmlspecialchars($post['title']); ?></h3>
                     </div>
+                    <img src="http://localhost:8888/mysocialnetwork/public/images/post-images/<?php echo $post['image']; ?>" alt="Post image" class="w-full h-32 object-cover mb-1 rounded-xl" />
                     <p class="text-black mb-4"><?php echo htmlspecialchars($post['content']); ?></p>
-                    <p class="text-sm text-blue-100 mb-1"><small>Créé le: <?php echo htmlspecialchars($post['created_at']); ?></small></p>
-                    <p class="text-sm text-blue-100"><small>Catégorie: <?php echo htmlspecialchars($post['category']); ?></small></p>
+                    <p class="text-sm text-blue-400 mb-1"><small>Créé le: <?php echo htmlspecialchars($post['created_at']); ?></small></p>
+                    <p class="text-sm text-blue-400"><small>Catégorie: <?php echo htmlspecialchars($post['category']); ?></small></p>
                     <div class="mt-4 flex justify-end">
-                        <a>
-                            <button class="bg-gray-400 text-white text-3xl p-2 rounded-xl border border-2 border-black hover:opacity-50">
-                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-6 h-6">
-                                    <path d="M16.2996 1.79981C16.8082 2.30839 16.9996 2.99984 16.9996 3.74984C16.9996 4.49984 16.8082 5.19129 16.2996 5.69987L5.49961 16.4999L1.99961 17.9999L3.49961 14.4999L14.2996 3.69987C14.8082 3.19129 15.4996 2.99984 16.2496 2.99984C16.9996 2.99984 17.6911 3.19129 18.1996 3.69987C19.3162 4.81653 19.3162 6.68323 18.1996 7.79989L7.39961 18.5999C7.61615 18.8164 7.83318 19.0334 8.04973 19.2499C9.29961 20.4998 11.2496 20.4998 12.4996 19.2499L19.2496 12.4999C20.4996 11.2499 20.4996 9.29987 19.2496 8.04987L11.4996 0.29987C10.2496 -0.950117 8.29961 -0.950117 7.04961 0.29987C6.83307 0.516421 6.61653 0.733464 6.39961 0.949873L17.1996 1.74984L16.2996 1.79981Z"></path>
-                                </svg>
-                            </button>
-                        </a>
                         <a href="?page=edit_post&id_post=<?php echo htmlspecialchars($post['id_post']); ?>">
-                            <button class="flex flex-row bg-blue-600 text-white text-3xl ml-6 rounded-xl p-2 border border-2 border-black hover:opacity-50">
+                            <button class="flex flex-row bg-blue-600 text-white text-sm ml-6 rounded-xl p-2 border border-2 border-black hover:opacity-50">
                                 <span class="mr-4">Modifier un post</span>
                             </button>
                         </a>
