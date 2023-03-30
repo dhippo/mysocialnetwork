@@ -38,6 +38,26 @@
         </a>
     </div>
 
+    <h1 class="text-4xl font-bold mt-10 mb-6">Mes AMIS</h1>
+    <div class="grid grid-cols-4 gap-4 mx-6">
+        <?php
+        foreach ($myFriends as $friend) {
+            ?>
+            <div class="border border-gray-300 rounded p-4 bg-white shadow w-full mx-auto mb-4 transform hover:scale-105 hover:border hover:border-blue-500 hover:border-3 transition duration-300">
+                <img class="w-20 h-20 rounded-full mx-auto" src="http://localhost:8888/mysocialnetwork/public/images/profile-images/<?= $friend['profile_picture'] ?>" alt="friend photo">
+                <h4 class="text-center mt-2 font-semibold hover:underline cursor-pointer">
+                    <a href="?page=user_profile&email_user_to_see=<?php echo htmlspecialchars($friend['email']); ?>">
+                        <?= $friend['first_name'] . ' ' . $friend['last_name'] ?>
+                    </a>
+                </h4>
+                <p class="text-center text-sm text-blue-700"><?= $friend['statut'] . ' - Promo ' . $friend['promo'] ?></p>
+            </div>
+            <?php
+        }
+        ?>
+    </div>
+
+
 
     <h1 class="text-4xl font-bold mt-10 mb-6">Mes Posts</h1>
 

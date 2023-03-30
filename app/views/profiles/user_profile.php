@@ -1,6 +1,7 @@
 <div class="w-auto rounded-xl ml-80 -mt-16">
     <div class="container mx-auto px-4 mt-8">
 
+
         <div class="bg-white shadow-md rounded-lg px-6 py-8 border">
             <div class="w-1/2 flex justify-between">
                 <h1 class="text-4xl font-bold mb-6">Profil de <?php echo htmlspecialchars($userProfileInfo['first_name']) . " " . htmlspecialchars($userProfileInfo['last_name']); ?></h1>
@@ -12,7 +13,11 @@
                         <?php if ($_SESSION['id_user'] == $userProfileId): ?>
                             <div class="bg-red-400 text-white font-semibold px-4 py-2 rounded-lg shadow-md flex justify-between">
                                 Il s'agit de votre compte
-                                <a href="?page=my_friends" class="text-red-900 hover:text-white underline">Voir mes amis</a>
+                                <a href="?page=profile" class="text-red-900 hover:text-white underline">Voir mes amis</a>
+                            </div>
+                        <?php elseif ($areFriends): ?>
+                            <div class="bg-green-400 text-white font-semibold px-4 py-2 rounded-lg shadow-md">
+                                Vous êtes déjà ami avec cette personne
                             </div>
                         <?php else: ?>
                             <input type="hidden" name="friend_email" value="<?php echo htmlspecialchars($userProfileInfo['email']); ?>">

@@ -8,9 +8,11 @@ function currentPage($page) {
     <div class="hidden lg:fixed lg:inset-y-0 lg:z-50 lg:flex lg:w-72 lg:flex-col">
         <!-- Sidebar component, swap this element with another sidebar if you like -->
         <div class="flex grow flex-col gap-y-5 overflow-y-auto border-r border-gray-200 bg-white px-6 pb-4">
+            <a href="?page=home">
             <div class="flex h-28 shrink-0 justify-center items-center bg-blue-600 rounded-xl mt-4">
                 <img class="h-20 w-auto rounded-xl" src="http://localhost:8888/mysocialnetwork/public/images/ece-logo.png" alt="ECE">
             </div>
+            </a>
             <nav class="flex flex-1 flex-col pt-2">
                 <ul role="list" class="flex flex-1 flex-col gap-y-7">
                     <li>
@@ -70,32 +72,6 @@ function currentPage($page) {
                         </ul>
                     </li>
 
-
-                    <!--<li>
-                        <div class="text-xs font-semibold leading-6 text-gray-400">Your teams</div>
-                        <ul role="list" class="-mx-2 mt-2 space-y-1">
-                            <li>
-                                <a href="#" class="text-gray-700 hover:text-blue-600 hover:bg-gray-50 group flex gap-x-3 rounded-md p-2 text-sm leading-6 font-semibold">
-                                    <span class="flex h-6 w-6 shrink-0 items-center justify-center rounded-lg border text-[0.625rem] font-medium bg-white text-gray-400 border-gray-200 group-hover:border-blue-600 group-hover:text-blue-600">H</span>
-                                    <span class="truncate">Heroicons</span>
-                                </a>
-                            </li>
-
-                            <li>
-                                <a href="#" class="text-gray-700 hover:text-blue-600 hover:bg-gray-50 group flex gap-x-3 rounded-md p-2 text-sm leading-6 font-semibold">
-                                    <span class="flex h-6 w-6 shrink-0 items-center justify-center rounded-lg border text-[0.625rem] font-medium bg-white text-gray-400 border-gray-200 group-hover:border-blue-600 group-hover:text-blue-600">T</span>
-                                    <span class="truncate">Tailwind Labs</span>
-                                </a>
-                            </li>
-
-                            <li>
-                                <a href="#" class="text-gray-700 hover:text-blue-600 hover:bg-gray-50 group flex gap-x-3 rounded-md p-2 text-sm leading-6 font-semibold">
-                                    <span class="flex h-6 w-6 shrink-0 items-center justify-center rounded-lg border text-[0.625rem] font-medium bg-white text-gray-400 border-gray-200 group-hover:border-blue-600 group-hover:text-blue-600">W</span>
-                                    <span class="truncate">Workcation</span>
-                                </a>
-                            </li>
-                        </ul>
-                    </li>-->
                     <li class="mt-auto">
                         <a href="?page=logout" class="group -mx-2 flex gap-x-3 rounded-md p-2 text-sm font-semibold leading-6 text-gray-700 hover:bg-gray-50 hover:text-blue-600">
                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">

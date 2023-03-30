@@ -1,7 +1,7 @@
 
 <div class="w-auto rounded-xl ml-80 -mt-16">
     <div class="container mx-auto px-4 mt-8">
-<form action="?page=edit_post&id_post=<?php echo $postInfo['id_post']; ?>" method="POST" enctype="multipart/form-data">
+<form class="border border-2 border-gray_200" action="?page=edit_post&id_post=<?php echo $postInfo['id_post']; ?>" method="POST" enctype="multipart/form-data">
     <div class="bg-white shadow-md rounded-lg px-6 py-8">
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
             <div class="mb-4 md:mb-0">
@@ -17,8 +17,13 @@
                     <input type="file" name="image" id="image" class="w-full mb-2">
                 </div>
 
-                <label for="category">Catégorie :</label>
-                <input type="text" name="category" id="category" value="<?php echo htmlspecialchars($postInfo['category']); ?>" class="w-full mb-2">
+                <label for="category" class="block text-gray-700 text-sm font-bold mb-2">Catégorie:</label>
+                <select name="category" id="category" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" required>
+                    <option value="event">Événement</option>
+                    <option value="news">Actualité</option>
+                    <option value="other">Autre</option>
+                </select>
+
 
                 <label for="visibility">Visibilité :</label>
                 <select name="visibility" id="visibility" class="w-full mb-2">
@@ -30,6 +35,7 @@
     </div>
     <div class="w-full flex justify-center mt-4">
         <button type="submit" name="submit" class="rounded-md bg-gray-600 py-2.5 px-3.5 text-sm font-semibold text-white shadow-sm hover:p-4">Enregistrer les modifications</button>
+        <button type="submit" name="delete" class="rounded-md bg-red-600 py-2.5 px-3.5 text-sm font-semibold text-white shadow-sm hover:p-4">Supprimer</button>
     </div>
 </form>
     </div>

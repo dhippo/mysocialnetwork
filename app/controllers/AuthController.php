@@ -9,17 +9,30 @@ error_reporting(E_ALL);
 class AuthController
 {
     private $userModel;
+    private $adminModel;
 
     public function __construct($pdo)
     {
         $this->userModel = new User($pdo);
+        $this->adminModel = new Admin($pdo);
+
     }
 
     public function isLoggedIn()
     {
-        return isset($_SESSION['id_user']);
+        if (isset($_SESSION['id_user']) || isset($_SESSION['id_admin'])) {
+             return isset($_SESSION['id_user']);
+        } elseif(isset($_SESSION['id_admin'])) {
+            return $_SESSION['id_admin'];
+        }else{
+            return false;
+        };
+
     }
 
+    /** *********************************************************************/
+    /** ******************            AUTH             *********************/
+    // case 'register':
     public function registerController()
     {
         if ($_SERVER['REQUEST_METHOD'] == 'POST') {
@@ -46,6 +59,7 @@ class AuthController
         }
     }
 
+    // case 'login':
     public function loginController()
     {
         if ($_SERVER['REQUEST_METHOD'] == 'POST') {
@@ -53,20 +67,32 @@ class AuthController
             $password = $_POST['password'];
 
             $user = $this->userModel->login($email, $password);
+
             if ($user) {
                 session_start();
-
                 $_SESSION['id_user'] = $user['id_user'];
                 $_SESSION['user_email'] = $user['email'];
-
-                //Rediriger vers la page de home
                 $params = array('page' => 'home');
                 $queryString = http_build_query($params);
                 header('Location: ' . $_SERVER['PHP_SELF'] . '?' . $queryString);
             } else {
                 echo "Identifiants incorrects.";
             }
+
+            // Vérifier si l'utilisateur est également un administrateur
+            $admin = $this->adminModel->login($email, $password);
+            if ($admin) {
+                session_start();
+                $_SESSION['id_admin'] = $admin['id_admin'];
+                $_SESSION['admin_email'] = $admin['email'];
+                $params = array('page' => 'admin_validator');
+                $queryString = http_build_query($params);
+                header('Location: ' . $_SERVER['PHP_SELF'] . '?' . $queryString);
+            }
         }
     }
+
+
+
 
 }

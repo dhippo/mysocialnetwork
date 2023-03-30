@@ -20,4 +20,6 @@ class AdminController
         $isBlocked = $action == 'block' ? 1 : 0;
         $this->adminModel->blockUserADMIN($idUser, $isBlocked);
     }
+
+
 }

@@ -1,17 +1,3 @@
-<?php
-if ($_GET['id_to'] != 'null') {
-    $id_to = $_GET['id_to'];
-    // Utilisez $id_to dans votre code
-} else if($_GET['id_to'] == 'null'){
-    // $last_msg = new Message($id_u, 2, 2, null, $pdo_connection);
-    // $id_to = $last_msg->last_discu($id_u);
-    $id_to = 2;
-
-}
-print('$_GET=<pre>'.print_r($_GET, true).'</pre><br><br>');
-
-?>
-
 <div class="w-auto rounded-xl ml-80 -mt-16">
     <script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha384-KyZXEAg3QhqLMpG8r+Knujsl5/ak8N2eQ2Kac6/2hQmpsZTEV3N3O3y1wKPIXg/6" crossorigin="anonymous"></script>
 
@@ -26,9 +12,6 @@ print('$_GET=<pre>'.print_r($_GET, true).'</pre><br><br>');
             </svg>
             <input type="text" id="search-user" name="search" value=""  placeholder="Recherche..." class="block h-full w-full border-0 py-0 pl-8 pr-0 text-gray-900 placeholder:text-gray-400 focus:ring-0 sm:text-sm"/>
         </form>
-
-        <?php var_dump($id_u) ?>
-
 
         <div class="p-8 m-8">
             <div id="result-search"></div>

@@ -27,5 +27,17 @@ class Admin
         $statement->bindValue(':idUser', $idUser);
         return $statement->execute();
     }
+    public function login($email, $password)
+    {
+        $query = "SELECT * FROM admins WHERE email = :email AND password = :password";
+        $stmt = $this->pdo->prepare($query);
+        $stmt->bindParam(':email', $email);
+        $stmt->bindParam(':password', $password);
+        $stmt->execute();
+        $admin = $stmt->fetch(PDO::FETCH_ASSOC);
+        return $admin;
+    }
+
+
 
 }

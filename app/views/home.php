@@ -14,28 +14,82 @@
                 </button>
             </a>
         </div>
+        <div class="w-full mb-8 ml-4 rounded-xl bg-gray-100 p-4">
+            <h1 class="text-4xl font-bold hover:underline hover:cursor-pointer mb-1 ml-6">Filtres</h1>
+            <p class="mb-2 ml-6">choisir des posts uniquement de la catégorie: </p>
+            <div class="flex mb-2">
+                <a href="?page=home&category=event">
+                    <button class="flex flex-row bg-white text-black text-xl ml-6 rounded-xl p-2 border border-2 border-black hover:opacity-50">
+                        <span class="font-bold pr-2">ÉVÈNEMENTS</span>
+                    </button>
+                </a>
+                <a href="?page=home&category=news">
+                    <button class="flex flex-row bg-white text-black text-xl ml-6 rounded-xl p-2 border border-2 border-black hover:opacity-50">
+                        <span class="font-bold pr-2">ACTUALITÉS</span>
+                    </button>
+                </a>
+                <a href="?page=home&category=other">
+                    <button class="flex flex-row bg-white text-black text-xl ml-6 rounded-xl p-2 border border-2 border-black hover:opacity-50">
+                        <span class="font-bold pr-2">GÉNÉRAL</span>
+                    </button>
+                </a>
+                <a href="?page=home&category=teacher">
+                    <button class="flex flex-row bg-white text-black text-xl ml-6 rounded-xl p-2 border border-2 border-black hover:opacity-50">
+                        <span class="font-bold pr-2">ENSEIGNANT</span>
+                    </button>
+                </a>
+                <a href="?page=home&category=student">
+                    <button class="flex flex-row bg-white text-black text-xl ml-6 rounded-xl p-2 border border-2 border-black hover:opacity-50">
+                        <span class="font-bold pr-2">ÉLÈVE</span>
+                    </button>
+                </a>
+            </div>
+        </div>
         <!-- DEBUT DIV DES ANNONCES -->
         <div id="all_public_posts" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mx-6">
             <?php foreach ($publicPosts as $post): ?>
+
                 <div class="flex justify-center m-2">
-                    <div class="post bg-white p-6 rounded-xl shadow-md border border-gray-200 w-full">
+                    <div class="post bg-white p-4 rounded-xl shadow-md border border-gray-200 w-full">
                         <h3 class="text-xl overflow-hidden font-semibold text-blue-500 h-12 truncate -mb-2 hover:underline hover:cursor-pointer">
                             <a href="?page=show_post&id_post=<?php echo $post['id_post']; ?>">
                                 <?php echo htmlspecialchars($post['title']); ?>
                             </a>
                         </h3>
-                        <button class="flex flex-col justify-center h-6 text-white px-4 py-4 rounded-xl shadow-sm border-2 bg-gray-700 hover:opacity-100 text-sm mb-4 -ml-2 opacity-80"><a class="font-bold tracking-wider">Évennement</a></button>
-                        <img src="http://localhost:8888/mysocialnetwork/public/images/post-images/<?php echo $post['image']; ?>" alt="Post image" class="w-full h-48 object-cover mb-1 rounded-xl" />
-                        <div class="flex flex-col justify-between h-28">
-                            <p class="text-xs text-black hover:underline hover:cursor-pointer">
+                        <?php if ($post['category'] == 'event'): ?>
+                            <button class="flex flex-col justify-center h-6 text-white px-4 py-4 rounded-xl shadow-sm border-2 bg-blue-900 hover:opacity-100 text-sm mb-4">
+                                <a class="font-bold tracking-wider">Évènement</a>
+                            </button>
+                        <?php elseif ($post['category'] == 'news'): ?>
+                            <button class="flex flex-col justify-center h-6 px-4 py-4 rounded-xl shadow-sm border border-2 border-blue-900 bg-white text-blue-900 hover:opacity-100 text-sm mb-4">
+                                <a class="font-bold tracking-wider">Actualité</a>
+                            </button>
+                        <?php else: ?>
+                            <button class="flex flex-col justify-center h-6 text-white px-4 py-4 rounded-xl shadow-sm border-2 border-gray-700 bg-gray-700 hover:opacity-100 text-sm mb-4 ">
+                                <a class="font-bold tracking-wider">Général</a>
+                            </button>
+                        <?php endif; ?>
+                        <img src="http://localhost:8888/mysocialnetwork/public/images/post-images/<?php echo $post['image']; ?>" alt="Post image" class="w-full h-52 object-cover mb-1 rounded-xl" />
+                        <div class="flex flex-col justify-between h-32">
+                            <p class="text-xs text-black hover:underline hover:cursor-pointer my-2">
                                 <a href="?page=user_profile&email_user_to_see=<?php echo htmlspecialchars($post['creator_email']); ?>">
                                     <?php echo htmlspecialchars($post['creator_email']); ?>
                                 </a>
                             </p>
-                            <!--<div class="flex space-x-2">
-                                <button class="bg-gradient-to-r w-1/3 from-blue-400 via-blue-500 to-blue-600 text-white px-4 py-2 rounded-xl shadow-xl border border-blue-200 hover:opacity-75">LIKE</button>
-                                <button class="bg-white w-1/3 text-gray-700 px-4 py-2 rounded-xl shadow-md border-2 border-gray-300 hover:opacity-75">DISLIKE</button>
-                            </div>-->
+                            <!--<p class="text-sm text-gray-500 overflow-hidden h-16 truncate my-2">
+                                <?php /*echo htmlspecialchars($post['content']); */?>
+                            </p>
+                            <p class="text-sm text-gray-500 overflow-hidden h-16 truncate my-2">
+                                <a href="?page=show_post&id_post=<?php /*echo $post['id_post']; */?>">
+                                    Voir plus
+                                </a>
+                            </p>-->
+                            <div class="flex justify-between items-center mt-4 my-2">
+                                <div class="text-xl text-gray-500">
+                                    <span class="mr-2"><?php echo $post['likes']/2; ?> likes</span>
+                                    <span><?php echo $post['dislikes']/2; ?> dislikes</span>
+                                </div>
+                            </div>
                             <div class="flex text-sm">
                                 <p class="text-gray-400"><?php echo htmlspecialchars($post['created_at']); ?></p>
                             </div>

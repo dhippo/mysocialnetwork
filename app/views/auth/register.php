@@ -50,10 +50,15 @@
             <label class="block text-gray-700 text-sm font-bold mb-2" for="statut">
                 Statut
             </label>
+            <div class="flex flex-row">
             <select class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" id="statut" name="statut" onchange="updatePromoField(this.value)" required>
                 <option value="Etudiant">Étudiant</option>
                 <option value="Enseignant">Enseignant</option>
             </select>
+            <svg class="ml-2 h-5 w-5 text-gray-400" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                <path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.938a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z" clip-rule="evenodd" />
+            </svg>
+            </div>
         </div>
 
         <div class="mb-4">
@@ -61,6 +66,7 @@
                 Promo
             </label>
             <input class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" id="promo" name="promo" type="text" placeholder="Matière" style="display: none;" >
+            <div class="flex flex-row">
             <select class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" id="promo_select" name="promo_select" required>
                 <option value="Bachelor 1ère année">Bachelor 1ère année</option>
                 <option value="Bachelor 2ème année">Bachelor 2ème année</option>
@@ -73,6 +79,7 @@
                 <option value="Ingénieur 4ème année">Ingénieur 4ème année</option>
                 <option value="Ingénieur 5ème année">Ingénieur 5ème année</option>
             </select>
+            </div>
         </div>
 
         <div class="mb-4">
@@ -104,9 +111,10 @@
             promoField.style.display = "none";
             promoSelect.style.display = "block";
         } else if (status === "Enseignant") {
-            promoLabel.innerText = "Matière enseignée";
+            promoLabel.innerText = "Les promos dans lesquelles vous enseignez";
             promoField.style.display = "block";
             promoSelect.style.display = "none";
+
         }
     }
 </script>

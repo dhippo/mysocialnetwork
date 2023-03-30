@@ -9,54 +9,168 @@ class UserController
         $this->userModel = new User($pdo);
     }
 
-    public function displayMyProfile()
-    {
-        return $this->userModel->getUserInformationById($_SESSION['id_user']);
-    }
-
-    public function updateMyProfile($id, $data, $file)
-    {
-        return $this->userModel->updateUser($id, $data, $file);
-    }
+    /** *********************************************************************/
+    /** ******************          for ADMIN             *********************/
+    // case 'admin':
     public function displayAllUsersWithFilter($filter)
     {
         return $this->userModel->displayAllUsersWithFilter($filter);
     }
-    public function displayAllUsers_SEACRH($filter)
-    {
-        return $this->userModel->displayAllUsers_SEACRH($filter);
+
+
+    /** ***********************************************************************/
+    /** ******************      NOTIFICATION          *************************/
+    // case 'notifs':
+    public function displayMyNotifications() {
+        $id_user = $_SESSION['id_user'];
+        return $this->userModel->getNotificationsByUserId($id_user);
     }
-    public function displayFilteredUsers($search)
+
+
+    /** ***********************************************************************/
+    /** ******************            PROFILE          ***********************/
+    // case 'profile':
+    public function displayMyProfile()
     {
-        if (!empty($search)) {
-            return $this->userModel->displayAllUsers_SEACRH($search);
+        return $this->userModel->getUserInformationById($_SESSION['id_user']);
+    }
+    public function displayMyFriends()
+    {
+        $id_user = $_SESSION['id_user'];
+        return $this->userModel->getMyFriends($id_user);
+    }
+
+    // case 'user_profile':
+    public function getUserIdByEmail($email)
+    {
+        return $this->userModel->getIdByEmail($email);
+    }
+    public function getUserProfileByEmail($email)
+    {
+        return $this->userModel->getUserProfileByEmail($email);
+    }
+    public function areFriends($userId1, $userId2)
+    {
+        return $this->userModel->areFriends($userId1, $userId2);
+    }
+
+    // case 'update_profile':
+
+    public function updateMyProfile($id, $data, $fileData, $old_profile_picture)
+    {
+        if (isset($fileData['profile_picture']) && $fileData['profile_picture']['error'] == 0) {
+            $uploadPath = '/Applications/MAMP/htdocs/mysocialnetwork/public/images/profile-images/';
+            $fileName = uniqid() . '_' . basename($fileData['profile_picture']['name']);
+            $targetFilePath = $uploadPath . $fileName;
+
+            move_uploaded_file($fileData['profile_picture']['tmp_name'], $targetFilePath);
+        } else {
+            $fileName = $old_profile_picture;
         }
-        return [];
+
+        return $this->userModel->updateUser($id, $data, $fileName);
     }
 
 
-    public function getUserNameById($userId)
+    /** ***********************************************************************/
+    /** ******************            POSTS          *************************/
+
+    // tout dans PostController
+
+
+    /** ***********************************************************************/
+    /** ******************            LIKES          *************************/
+
+    // tout dans PostController
+
+
+    /** ***********************************************************************/
+    /** ******************            FRIENDS          *************************/
+    // case 'ask_friend':
+    public function addFriendController()
     {
-
-        $userInfo = $this->userModel->getUserInformationById($userId);
-
-        return [
-            'first_name' => $userInfo['first_name'],
-            'last_name' => $userInfo['last_name'],
-            'profile_picture' => $userInfo['profile_picture'],
-        ];
+        if (isset($_POST['friend_email']) && !empty($_POST['friend_email'])) {
+            $friend_email = $_POST['friend_email'];
+            $inviter_user_id = $_SESSION['id_user'];
+            $invited_user_id = $this->userModel->getIdByEmail($friend_email);
+            print('$_POST=<pre>'.print_r($_POST, true).'</pre><br><br>');
+            var_dump($invited_user_id);
+            if ($invited_user_id !== null) {
+                if ($this->userModel->sendFriendRequest($inviter_user_id, $invited_user_id)) {
+                    $content = "Vous avez reçu une demande d'ami de " . $_SESSION['first_name'] . " " . $_SESSION['last_name'];
+                    $this->userModel->sendNotification($invited_user_id, $content);
+                    header('Location: ?page=user_profile&email_user_to_see=' . $friend_email);
+                } else {
+                    echo "Erreur lors de l'envoi de la demande d'ami.";
+                }
+            } else {
+                echo "L'utilisateur n'existe pas.";
+            }
+        } else {
+            header('Location: ?page=home');
+        }
     }
-    public function displayUserProfile($id_to)
+    //    case 'add_friend':
+    public function acceptFriendRequest($id_notification)
     {
-        return $this->userModel->getUserInformationById($id_to);
+        $id_request = $this->userModel->getFriendRequestIdByNotificationId($id_notification);
+
+        if ($id_request !== null) {
+            $notification = $this->userModel->getNotificationById($id_notification);
+            if ($this->userModel->updateFriendRequestStatus($id_request, 'accepted')) {
+                $this->userModel->archiveNotification(
+                    $id_notification,
+                    $notification['user_id'],
+                    $notification['content'],
+                    $notification['created_at']
+                );
+                $this->userModel->deleteNotification($id_notification);
+                header('Location: ?page=my_notifs');
+            } else {
+                echo "Erreur lors de l'acceptation de la demande d'ami.";
+            }
+        } else {
+            echo "La demande d'ami est introuvable.";
+        }
     }
+
+    // case 'refuse_friend':
+    public function refuseFriendRequest($id_notification)
+    {
+        $id_request = $this->userModel->getFriendRequestIdByNotificationId($id_notification);
+        if ($id_request !== null) {
+            $notification = $this->userModel->getNotificationById($id_notification);
+            if ($this->userModel->updateFriendRequestStatus($id_request, 'refused')) {
+                $this->userModel->archiveNotification(
+                    $id_notification,
+                    $notification['user_id'],
+                    $notification['content'],
+                    $notification['created_at']
+                );
+                $this->userModel->deleteNotification($id_notification);
+                header('Location: ?page=my_notifs');
+            } else {
+                echo "Erreur lors du refus de la demande d'ami.";
+            }
+        } else {
+            echo "La demande d'ami est introuvable.";
+        }
+    }
+
+
+    /** ***********************************************************************/
+    /** ******************        RELATIONS          *************************/
+    // case 'all_users':
+    public function displayAllUsers() {
+        return $this->userModel->getAllUsers();
+    }
+
+    // case 'search_user':
     public function searchUserController() {
         if (isset($_GET['users'])) {
             $users = (string) trim($_GET['users']); //trim pour enlever espace avant et apres
             $userId=$_GET['userId'];
             //   $userId=24;
-
-
             $pdo = new Database();
             $pdo_connection = $pdo->getConnection();
 
@@ -84,93 +198,41 @@ class UserController
             }
         }
     }
-
-    public function getUserIdByEmail($email)
+    // non utilisées
+    public function displayAllUsers_SEACRH($filter)
     {
-        return $this->userModel->getIdByEmail($email);
+        return $this->userModel->displayAllUsers_SEACRH($filter);
     }
-    public function getUserProfileByEmail($email)
+    public function displayFilteredUsers($search)
     {
-        return $this->userModel->getUserProfileByEmail($email);
-    }
-
-
-    public function displayAllUsers() {
-        return $this->userModel->getAllUsers();
-    }
-    public function addFriendController()
-    {
-        if (isset($_POST['friend_email']) && !empty($_POST['friend_email'])) {
-            $friend_email = $_POST['friend_email'];
-            $inviter_user_id = $_SESSION['id_user'];
-            $invited_user_id = $this->userModel->getIdByEmail($friend_email);
-            print('$_POST=<pre>'.print_r($_POST, true).'</pre><br><br>');
-            var_dump($invited_user_id);
-            if ($invited_user_id !== null) {
-                if ($this->userModel->sendFriendRequest($inviter_user_id, $invited_user_id)) {
-                    $content = "Vous avez reçu une demande d'ami de " . $_SESSION['first_name'] . " " . $_SESSION['last_name'];
-                    $this->userModel->sendNotification($invited_user_id, $content);
-                    header('Location: ?page=user_profile&email_user_to_see=' . $friend_email);
-                } else {
-                    echo "Erreur lors de l'envoi de la demande d'ami.";
-                }
-            } else {
-                echo "L'utilisateur n'existe pas.";
-            }
-        } else {
-            header('Location: ?page=home');
+        if (!empty($search)) {
+            return $this->userModel->displayAllUsers_SEACRH($search);
         }
-    }
-    public function displayMyNotifications() {
-        $id_user = $_SESSION['id_user'];
-        return $this->userModel->getNotificationsByUserId($id_user);
+        return [];
     }
 
-    public function acceptFriendRequest($id_notification)
+
+    /** *********************************************************************/
+    /** ******************            HOME             *********************/
+    // case 'home':
+    public function displayUserProfile($id_to)
     {
-        $id_request = $this->userModel->getFriendRequestIdByNotificationId($id_notification);
-
-        if ($id_request !== null) {
-            $notification = $this->userModel->getNotificationById($id_notification);
-            if ($this->userModel->updateFriendRequestStatus($id_request, 'accepted')) {
-                $this->userModel->archiveNotification(
-                    $id_notification,
-                    $notification['user_id'],
-                    $notification['content'],
-                    $notification['created_at']
-                );
-                $this->userModel->deleteNotification($id_notification);
-                header('Location: ?page=my_notifs');
-            } else {
-                echo "Erreur lors de l'acceptation de la demande d'ami.";
-            }
-        } else {
-            echo "La demande d'ami est introuvable.";
-        }
+        return $this->userModel->getUserInformationById($id_to);
     }
 
-    public function refuseFriendRequest($id_notification)
+
+    /** *********************************************************************/
+    // pour le routeur
+    public function getUserNameById($userId)
     {
-        $id_request = $this->userModel->getFriendRequestIdByNotificationId($id_notification);
-        if ($id_request !== null) {
-            $notification = $this->userModel->getNotificationById($id_notification);
-            if ($this->userModel->updateFriendRequestStatus($id_request, 'refused')) {
-                $this->userModel->archiveNotification(
-                    $id_notification,
-                    $notification['user_id'],
-                    $notification['content'],
-                    $notification['created_at']
-                );
-                $this->userModel->deleteNotification($id_notification);
-                header('Location: ?page=my_notifs');
-            } else {
-                echo "Erreur lors du refus de la demande d'ami.";
-            }
-        } else {
-            echo "La demande d'ami est introuvable.";
-        }
+
+        $userInfo = $this->userModel->getUserInformationById($userId);
+
+        return [
+            'first_name' => $userInfo['first_name'],
+            'last_name' => $userInfo['last_name'],
+            'profile_picture' => $userInfo['profile_picture'],
+        ];
     }
-
-
 
 }

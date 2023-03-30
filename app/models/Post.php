@@ -17,6 +17,43 @@ class Post
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
+    public function getAllPublicPostsByCategory($category)
+    {
+        $query = "SELECT * FROM posts WHERE visibility = 'public' AND category = :category ORDER BY created_at DESC";
+        $stmt = $this->pdo->prepare($query);
+        $stmt->execute(['category' => $category]);
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    public function getAllPublicPostsByCreatorEmail($email)
+    {
+        $query = "SELECT * FROM posts WHERE visibility = 'public' AND creator_email LIKE :email ORDER BY created_at DESC";
+        $stmt = $this->pdo->prepare($query);
+        $stmt->execute(['email' => '%' . $email]);
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+    public function getFriendsPosts($friendsEmails)
+    {
+        // Vérifier si le tableau $friendsEmails est vide
+        if (empty($friendsEmails)) {
+            return [];
+        }
+
+        // Transformer le tableau en chaîne de caractères séparée par des virgules et entourée de guillemets simples
+        $friendsEmailsStr = "'" . implode("','", $friendsEmails) . "'";
+
+        // Modifier la requête SQL
+        $sql = "SELECT posts.* FROM posts WHERE posts.creator_email IN ($friendsEmailsStr) ORDER BY posts.created_at DESC";
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->execute();
+
+        // Récupérer les résultats
+        $friendsPosts = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        return $friendsPosts;
+    }
+
+
+
     public function create($postData, $fileName, $creatorId)
     {
         $creatorEmail = $_SESSION['user_email'];
@@ -62,12 +99,20 @@ class Post
         $stmt = $this->pdo->prepare($sql);
         return $stmt->execute([$title, $fileName, $content, $category, $visibility, $updated_at, $id_post]);
     }
+    public function deletePost($id_post)
+    {
+        $sql = "DELETE FROM posts WHERE id_post = ?";
+        $stmt = $this->pdo->prepare($sql);
+        return $stmt->execute([$id_post]);
+    }
+
 
     public function addLike($id_post, $likes)
     {
         $sql = "UPDATE posts SET likes = likes + 1 WHERE id_post = :id_post";
         $statement = $this->pdo->prepare($sql);
         $statement->bindValue(':id_post', $id_post);
+
         return $statement->execute();
     }
     public function addDislike($id_post, $dislikes)
