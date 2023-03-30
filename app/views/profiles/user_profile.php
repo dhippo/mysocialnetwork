@@ -26,6 +26,14 @@
                             </button>
                         <?php endif; ?>
                     </form>
+                    </form>
+
+                    <form action="?page=message&id_to=<?php echo ($userProfileInfo['id_user']); ?>" method="post" class="w-full mt-4 mb-4">
+                        <button type="chat" class="bg-green-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded-lg shadow-md focus:outline-none focus:ring-2 focus:ring-green-400 focus:ring-opacity-75">
+                            Chat
+                        </button>
+
+                    </form>
                     <h2 class="text-xl font-semibold mb-2 underline">Coordonnées</h2>
                     <ul class="text-gray-700">
                         <li class="mb-2"><strong>Email :</strong> <?php echo htmlspecialchars($userProfileInfo['email']); ?></li>

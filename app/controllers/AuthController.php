@@ -45,6 +45,12 @@ class AuthController
             $statut = $_POST['statut'];
             $birth_date = $_POST['birth_date'];
 
+            // Valider le mot de passe
+            if (!$this->userModel->isPasswordValid($password)) {
+                echo "Le mot de passe doit contenir au moins une majuscule, un chiffre et un caractère spécial.";
+                return;
+            }
+
             // Inscription de l'utilisateur
             $result = $this->userModel->register($email, $first_name, $last_name, $password, $promo, $statut, $birth_date);
             if ($result) {
@@ -59,6 +65,7 @@ class AuthController
         }
     }
 
+
     // case 'login':
     public function loginController()
     {
@@ -69,12 +76,17 @@ class AuthController
             $user = $this->userModel->login($email, $password);
 
             if ($user) {
-                session_start();
-                $_SESSION['id_user'] = $user['id_user'];
-                $_SESSION['user_email'] = $user['email'];
-                $params = array('page' => 'home');
-                $queryString = http_build_query($params);
-                header('Location: ' . $_SERVER['PHP_SELF'] . '?' . $queryString);
+                if ($user['validated'] == 1) {
+                    session_start();
+                    $_SESSION['id_user'] = $user['id_user'];
+                    $_SESSION['user_email'] = $user['email'];
+                    $params = array('page' => 'home');
+                    $queryString = http_build_query($params);
+                    header('Location: ' . $_SERVER['PHP_SELF'] . '?' . $queryString);
+                }
+                else {
+                    echo "Votre compte n'a pas encore été validé par un administrateur.";
+                }
             } else {
                 echo "Identifiants incorrects.";
             }

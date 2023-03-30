@@ -76,6 +76,16 @@ class User
         }
     }
 
+    public function isPasswordValid($password) {
+        $hasUpperCase = preg_match('/[A-Z]/', $password);
+        $hasLowerCase = preg_match('/[a-z]/', $password);
+        $hasNumber = preg_match('/\d/', $password);
+        $hasSpecialChar = preg_match('/[!@#$%^&*(),.?":{}|<>]/', $password);
+
+        return $hasUpperCase && $hasLowerCase && $hasNumber && $hasSpecialChar;
+    }
+
+
 
 
     /** ***********************************************************************/
@@ -158,12 +168,12 @@ class User
 
 
     // case 'update_profile':
-    public function updateUser($id, $data, $profile_picture)
+    public function updateUser($id, $data, $profile_picture, $old_email)
     {
         $first_name = $data['first_name'];
         $last_name = $data['last_name'];
         $birth_date = $data['birth_date'];
-        $email = $data['email'];
+        $email = $old_email;
         $promo = $data['promo'];
         $statut = $data['statut'];
         $bio = $data['bio'];

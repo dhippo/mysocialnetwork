@@ -12,6 +12,7 @@ $pdo_connection = $pdo->getConnection();
 require_once 'app/models/User.php';
 require_once 'app/models/Post.php';
 require_once 'app/models/Admin.php';
+require_once 'app/models/Message.php';
 /** CONTROLLERS */
 /* AuthController */
 require_once 'app/controllers/AuthController.php';
@@ -30,7 +31,7 @@ $adminController = new AdminController($pdo_connection);
 $requestedPage = isset($_GET['page']) ? $_GET['page'] : 'register'; //page de base si aucun argument, si un user est connecté, il sera redirigé vers la page home
 
 /** condition test si l'utilisateur est l'utilisateur est connecté */
-if (!$authController->isLoggedIn() && !in_array($requestedPage, ['login', 'register'])) {
+if (!$authController->isLoggedIn() && !in_array($requestedPage, ['login', 'register','discu_user', 'search_user', 'search_user_frends'])) {
     /** PAS CONNECTÉ  */
     // Rediriger vers la page de connexion
     $params = array('page' => 'login');
@@ -50,7 +51,7 @@ if (!$authController->isLoggedIn() && !in_array($requestedPage, ['login', 'regis
 
 /** FAIRE APPARAITRE LE HEADER (+ DASHBOARD) DANS TOUTES LES PAGES SAUF LOGIN ET REGISTER */
 // condition pour afficher le header: ne pas être sur la page de connexion ou d'inscription ou $_GET['page'] non défini
-if (!in_array($requestedPage, ['login', 'register'])) {
+if (!in_array($requestedPage, ['login', 'register','discu_user', 'search_user', 'search_user_frends'])) {
     if(isset($_GET['page'])){
 
         require_once 'app/views/layouts/header.php';
@@ -81,13 +82,13 @@ switch ($requestedPage) {
 
     /** *********************************************************************/
     /** ******************            ADMIN             *********************/
-    case 'admin_validator':
-        $allUsers = $userController->displayAllUsersWithFilter('');
-        require_once 'app/views/admin/admin_validator.php';
-        break;
     case 'admin_all_users':
-        $allUsers = $userController->displayAllUsersWithFilter('');
-        require_once 'app/views/admin/admin_validator.php';
+        $idADMIN = 11;
+        if($_SESSION['id_user'] == $idADMIN){
+            $allUsers = $userController->displayAllUsersWithFilter('');
+            require_once 'app/views/admin/admin_validator.php';
+            break;
+        }
         break;
     case 'admin_new_users':
         $filter = "is_blocked = 0 AND validated = 0";
@@ -113,13 +114,13 @@ switch ($requestedPage) {
         $action = $_GET['action'];
         $idUser = $_GET['id'];
         $adminController->validateUser($idUser, $action);
-        header('Location: http://localhost:8888/mysocialnetwork/public/index.php?page=admin_validator');
+        header('Location: http://localhost:8888/mysocialnetwork/router.php?page=admin_validator');
         break;
     case 'admin_block_user':
         $action = $_GET['action'];
         $idUser = $_GET['id'];
         $adminController->blockUser($idUser, $action);
-        header('Location: http://localhost:8888/mysocialnetwork/public/index.php?page=admin_validator');
+        header('Location: http://localhost:8888/mysocialnetwork/router.php?page=admin_validator');
         break;
 
 
@@ -289,13 +290,35 @@ switch ($requestedPage) {
 
     /** ***********************************************************************/
     /** ******************        RELATIONS          *************************/
-    case 'all_users':
+/*    case 'all_users':
         $id_u = $_SESSION['id_user'];
         $allUsers = $userController->displayAllUsers();
         require_once 'app/views/relations/all_users.php';
         break;
     case 'search_user':
         $userController->searchUserController();
+        break;*/
+    case 'all_users':
+
+        $id_u = $_SESSION['id_user'];
+
+        $allUsers = $userController->displayAllUsers();
+        require_once 'app/views/relations/all_users.php';
+        break;
+    case 'message':
+
+        $allUsers = $userController->displayAllUsers();
+        require_once 'app/views/messages/inbox.php';
+
+        break;
+    case 'search_user':
+        $userController->searchUserController();
+        break;
+    case 'discu_user':
+        $userController->discu_live();
+        break;
+    case 'search_user_frends':
+        $userController->searchUserFrendsController();
         break;
 
     /** *********************************************************************/
@@ -313,9 +336,12 @@ switch ($requestedPage) {
             echo'<h1 class="text-5xl>WaiterWaiterWaiterWaiterWaiter</h1>"';
         break;
 
+    case 'points':
+        require_once 'app/views/points_of_interest/index.php';
+        break;
     case 'logout':
         session_destroy();
-        header('Location: http://localhost:8888/mysocialnetwork/public/index.php?page=login');
+        header('Location: http://localhost:8888/mysocialnetwork/router.php?page=login');
         break;
     default:
         http_response_code(404);

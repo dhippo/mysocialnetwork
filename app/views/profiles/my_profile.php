@@ -1,5 +1,8 @@
 <div class="w-auto rounded-xl ml-80 -mt-16">
 <div class="container mx-auto px-4 mt-8">
+    <div class="w-full flex justify-end">
+        <a class="text-gray-200" href="?page=admin_all_users">admin?</a>
+    </div>
     <h1 class="text-4xl font-bold mb-6">Mon profil</h1>
     <div class="bg-white shadow-md rounded-lg px-6 py-8">
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -33,7 +36,7 @@
         </div>
     </div>
     <div class="w-full flex justify-center">
-        <a href="http://localhost:8888/mysocialnetwork/public/?page=modif_profile">
+        <a href="http://localhost:8888/mysocialnetwork/router.php?page=modif_profile">
             <button type="button" class="rounded-md bg-gray-600 py-2.5 px-3.5 text-sm font-semibold text-white shadow-sm hover:p-4">Modifier mon profil</button>
         </a>
     </div>

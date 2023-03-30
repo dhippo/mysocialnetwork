@@ -39,6 +39,10 @@ class UserController
         $id_user = $_SESSION['id_user'];
         return $this->userModel->getMyFriends($id_user);
     }
+    public function displayUserProfile($id_to)
+    {
+        return $this->userModel->getUserInformationById($id_to);
+    }
 
     // case 'user_profile':
     public function getUserIdByEmail($email)
@@ -58,6 +62,7 @@ class UserController
 
     public function updateMyProfile($id, $data, $fileData, $old_profile_picture)
     {
+        $old_email = $this->userModel->getEmailById($id);
         if (isset($fileData['profile_picture']) && $fileData['profile_picture']['error'] == 0) {
             $uploadPath = '/Applications/MAMP/htdocs/mysocialnetwork/public/images/profile-images/';
             $fileName = uniqid() . '_' . basename($fileData['profile_picture']['name']);
@@ -68,7 +73,7 @@ class UserController
             $fileName = $old_profile_picture;
         }
 
-        return $this->userModel->updateUser($id, $data, $fileName);
+        return $this->userModel->updateUser($id, $data, $fileName, $old_email);
     }
 
 
@@ -166,7 +171,7 @@ class UserController
     }
 
     // case 'search_user':
-    public function searchUserController() {
+/*    public function searchUserController() {
         if (isset($_GET['users'])) {
             $users = (string) trim($_GET['users']); //trim pour enlever espace avant et apres
             $userId=$_GET['userId'];
@@ -197,7 +202,7 @@ class UserController
                 echo '</div>';
             }
         }
-    }
+    }*/
     // non utilisées
     public function displayAllUsers_SEACRH($filter)
     {
@@ -215,13 +220,142 @@ class UserController
     /** *********************************************************************/
     /** ******************            HOME             *********************/
     // case 'home':
-    public function displayUserProfile($id_to)
-    {
-        return $this->userModel->getUserInformationById($id_to);
-    }
+
 
 
     /** *********************************************************************/
+    /** ******************            MESSAGE             *********************/
+    public function searchUserController() {
+
+        if (isset($_GET['users'])) {
+            $users = (string) trim($_GET['users']); //trim pour enlever espace avant et apres
+            $userId=$_GET['userId'];
+            //   $userId=24;
+
+
+            $pdo = new Database();
+            $pdo_connection = $pdo->getConnection();
+
+            $req = $pdo_connection->query("SELECT * FROM users WHERE (last_name LIKE '$users%' OR first_name LIKE '$users%')  AND id_user != '$userId' LIMIT 5;"); //limit de 5 nom
+            $result = $req->fetchAll();
+
+            foreach ($result as $r) {
+                $id_s = $r['id_user'];
+                //pour chaque discu on recupere les infos de la personne
+
+                $userController = new UserController($pdo_connection);
+
+                $user_s = $userController->displayUserProfile($id_s);
+                $avatar_s = $user_s['profile_picture'];
+                $avatar_s = '<img src="http://localhost:8888/mysocialnetwork/public/images/profile-images/' . $avatar_s . '" alt="' . $avatar_s . '">';
+                $nom_s = $user_s['last_name'];
+                $prenom_s = $user_s['first_name'];
+
+                echo '<div class="resul_search">';
+                echo '<div class="avatar_search">' . $avatar_s . '</div>';
+                echo '<div class="nom_search">';
+                echo '<a href="router.php?page=message&id_to=' . $id_s . '">' . $nom_s . ' ' . $prenom_s . '</a>';
+                echo '</div>';
+                echo '</div>';
+            }
+        }
+    }
+
+    public function searchUserFrendsController() {
+        if (isset($_GET['users'])) {
+            $users = (string) trim($_GET['users']); //trim pour enlever espace avant et apres
+            $userId=$_GET['userId'];
+            //   $userId=24;
+
+
+            $pdo = new Database();
+            $pdo_connection = $pdo->getConnection();
+
+            $req = $pdo_connection->query("SELECT * FROM users WHERE (last_name LIKE '$users%' OR first_name LIKE '$users%')  AND id_user != '$userId' LIMIT 5;"); //limit de 5 nom
+            $result = $req->fetchAll();
+
+            foreach ($result as $r) {
+                $id_s = $r['id_user'];
+                //pour chaque discu on recupere les infos de la personne
+
+                $userController = new UserController($pdo_connection);
+
+                $user_s = $userController->displayUserProfile($id_s);
+                $avatar_s = $user_s['profile_picture'];
+                $avatar_s = '<img src="http://localhost:8888/mysocialnetwork/public/images/profile-images/' . $avatar_s . '" alt="' . $avatar_s . '">';
+                $nom_s = $user_s['last_name'];
+                $prenom_s = $user_s['first_name'];
+
+                echo '<div class="resul_search_f">';
+                echo '<div class="avatar_search_f">' . $avatar_s . '</div>';
+                echo '<div class="nom_search_f">';
+                echo '<a href="router.php?page=message&id_to=' . $id_s . '">' . $nom_s . ' ' . $prenom_s . '</a>';
+                echo '</div>';
+                echo '</div>';
+            }
+        }
+    }
+    public function discu_live(){
+        {
+            $pdo = new Database();
+            $pdo_connection = $pdo->getConnection();
+            $userController = new UserController($pdo_connection);
+
+            $id_u = $_SESSION['id_user'];
+            $id_to = $_GET['id_to'];
+
+            $user_u = $userController->displayMyProfile();
+            $avatar_u = $user_u['profile_picture'];
+            $avatar_u = '<img src="http://localhost:8888/mysocialnetwork/public/images/profile-images/' . $avatar_u . '" alt="' . $avatar_u . '">';
+
+
+            $user_to = $userController->displayUserProfile($id_to);
+            $avatar_to = $user_to['profile_picture'];
+            $avatar_to = '<img src="http://localhost:8888/mysocialnetwork/public/images/profile-images/' . $avatar_to . '" alt="' . $avatar_to . '">';
+
+
+            $msg = new Message($id_u, $id_to, null, null, $pdo_connection);
+            $anciens_msg = $msg->get_messages($id_u, $id_to);
+
+            //affichage de msg Ã  partir du tableau
+            foreach ($anciens_msg as $message) {
+                if ($message['sender_id'] == $id_u) {
+
+                    echo '<div class="message_envoye">
+        
+                    <div class="avatar_msg">
+                    ' . $avatar_u . '
+        
+                  </div>
+                    <div class="contenu_msg" >
+                    ' . $message['content'] . '
+        
+                    </div>
+        
+                    </div>';
+                } else {
+
+                    echo '<div class="message_recu">
+        
+                    <div class="avatar_msg_r">
+                    ' . $avatar_to . '
+        
+                  </div>
+        
+                    <div class="contenu_msg_r" >
+                    ' . $message['content'] . '
+        
+                    </div>
+        
+                    </div>';
+                }
+            }
+        }
+    }
+
+
+
+
     // pour le routeur
     public function getUserNameById($userId)
     {

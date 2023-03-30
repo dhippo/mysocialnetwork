@@ -18,7 +18,7 @@
                 <div>
                     <h2 class="text-xl font-semibold mb-2">Coordonnées</h2>
                     <label for="email">Email :</label>
-                    <input type="email" name="email" id="email" value="<?php echo htmlspecialchars($userInfo['email']); ?>" class="w-full mb-2">
+                    <input type="email" name="email" id="email" disabled="disabled" value="<?php echo htmlspecialchars($userInfo['email']); ?>" class="w-full mb-2">
                 </div>
                 <div>
                     <h2 class="text-xl font-semibold mb-2">Photo de profil</h2>

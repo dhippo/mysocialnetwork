@@ -10,7 +10,6 @@
             </div>
         </div>
         <div>
-            <h3 class="text-center text-2xl font-semibold mt-6 mb-4">Liste des utilisateurs: </h3>
 
             <div class="grid grid-cols-4 gap-4 mx-6">
                 <?php
