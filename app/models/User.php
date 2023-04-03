@@ -3,14 +3,38 @@
 
 class User
 {
-    private $pdo;
+    private $id;
+    private $email;
+    private $first_name;
+    private $last_name;
+    private $password;
+    private $promo;
+    private $statut;
+    private $bio;
+    private $birth_date;
+    private $profile_picture;
+    private $interests;
+    private $validated;
+    private $is_blocked;
 
-    public function __construct($pdo)
+    public function __construct($data)
     {
-        $this->pdo = $pdo;
+        $this->id = $data['id'];
+        $this->email = $data['email'];
+        $this->first_name = $data['first_name'];
+        $this->last_name = $data['last_name'];
+        $this->password = $data['password'];
+        $this->promo = $data['promo'];
+        $this->statut = $data['statut'];
+        $this->bio = $data['bio'];
+        $this->birth_date = $data['birth_date'];
+        $this->profile_picture = $data['profile_picture'];
+        $this->interests = $data['interests'];
+        $this->validated = $data['validated'];
+        $this->is_blocked = $data['is_blocked'];
     }
 
-    public function register($email, $first_name, $last_name, $password, $promo, $statut, $bio, $birth_date, $profile_picture, $interests)
+   /* public function register($email, $first_name, $last_name, $password, $promo, $statut, $bio, $birth_date, $profile_picture, $interests)
     {
         $password = password_hash($_POST['password'], PASSWORD_DEFAULT);
         $validated = 0;
@@ -125,7 +149,7 @@ class User
 
         // Retourner le chemin relatif vers l'image pour l'enregistrer dans la base de données
         return 'images/profile-images/' . $uniqueFileName;
-    }
+    }*/
 
 
 

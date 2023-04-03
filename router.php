@@ -1,6 +1,10 @@
 <?php
 session_start();
 
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
+
 /** DATABASE */
 
 require_once 'app/models/Database.php';
@@ -8,7 +12,7 @@ $pdo = new Database();
 $pdo_connection = $pdo->getConnection();
 
 /** MODELS */
-
+require_once 'app/models/UserDAO.php';
 require_once 'app/models/User.php';
 require_once 'app/models/Post.php';
 
@@ -27,39 +31,77 @@ $postController = new PostController($pdo_connection);
 
 $requestedPage = isset($_GET['page']) ? $_GET['page'] : 'register'; //page de base si aucun argument
 
+/** DATABASE */
+require_once 'app/models/Database.php';
+$pdo = new Database();
+$pdo_connection = $pdo->getConnection();
+
+
+/** MODELS */
+require_once 'app/models/User.php';
+
+
 if (!$authController->isLoggedIn() && !in_array($requestedPage, ['login', 'register'])) {
     // Rediriger vers la page de connexion
     $params = array('page' => 'login');
     $queryString = http_build_query($params);
     header('Location: ' . $_SERVER['PHP_SELF'] . '?' . $queryString);
     exit;
-} else {
-    $userFullName = $userController->getUserNameById($_SESSION['id_user']);
+}
+/*else {
+    //$userFullName = $userController->getUserNameById($_SESSION['id_user']);
     $_SESSION['first_name'] = $userFullName['first_name'];
     $_SESSION['last_name'] = $userFullName['last_name'];
     $_SESSION['profile_picture'] = $userFullName['profile_picture'];
-}
+}*/
 
-// condition pour afficher le header: ne pas être sur la page de connexion ou d'inscription ou $_GET['page'] non défini
+// ne pas afficher le header sur les vues de connexion ou d'inscription ou $_GET['page'] non défini
 if (!in_array($requestedPage, ['login', 'register'])) {
     if(isset($_GET['page'])){
        require_once 'app/views/layouts/header.php';
     }
 }
 
+
+
+/** CONTROLLERS */
+/** AuthController */
+require_once 'app/controllers/AuthController.php';
+$authController = new AuthController($pdo_connection);
+/** UserController */
+require_once 'app/controllers/UserController.php';
+$userController = new UserController($pdo_connection);
+
+$requestedPage = isset($_GET['page']) ? $_GET['page'] : 'register'; //page de base si aucun argument
+
 switch ($requestedPage) {
     case 'login':
-        $authController->loginController();
-        require_once 'app/views/auth/login.php';
+        if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+            $authController->loginController();
+        } else {
+            $authController->showLogin();
+        }
         break;
+
     case 'register':
-        $authController->registerController();
-        require_once 'app/views/auth/register.php';
+        if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+            $authController->registerController();
+        } else {
+            $authController->showRegister();
+        }
         break;
+
     case 'home':
-        $publicPosts = $postController->displayAllPublicPosts();
         require_once 'app/views/home.php';
         break;
+
+
+
+/*        case 'home':
+        $publicPosts = $postController->displayAllPublicPosts();
+        require_once 'app/views/home.php';
+        break;*/
+
     case 'home2':
         $publicPosts = $postController->displayAllPublicPosts();
         require_once 'app/views/home2.php';

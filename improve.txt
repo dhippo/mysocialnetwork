@@ -1,0 +1,20 @@
+Utilisation de l'objet User:
+Vous avez mentionné que vous vous demandiez si vous devriez créer un objet User avec les champs de votre base de données.
+En effet, cela peut être une bonne pratique car cela permet de mieux structurer votre code et de rendre votre modèle plus clair.
+Vous pouvez créer une classe User avec des propriétés correspondant aux champs de votre table de base de données, et des méthodes
+pour interagir avec la base de données, comme vous l'avez fait dans votre modèle User. Cela peut également faciliter la réutilisation
+du code dans d'autres parties de votre application.
+
+Rôle du routeur:
+Vous avez demandé si c'est le rôle du routeur de renvoyer les vues. Le routeur peut effectivement inclure la vue appropriée en fonction
+de la page demandée, mais il est préférable de séparer la logique de présentation de la logique de contrôle.
+Ainsi, vous pouvez créer une classe View qui gère la présentation de vos pages. Dans votre routeur, vous pouvez appeler des méthodes de votre
+contrôleur pour traiter la requête et récupérer les données nécessaires pour la vue, puis appeler une méthode de la classe View pour
+afficher la page appropriée avec ces données.
+
+Utilisation de méthodes HTTP appropriées: Vous pouvez utiliser les méthodes HTTP appropriées (GET, POST, PUT, DELETE)
+pour les différentes actions de votre contrôleur. Par exemple, la méthode GET peut être utilisée pour récupérer les informations d'un utilisateur,
+la méthode POST pour enregistrer un nouvel utilisateur, et la méthode PUT pour mettre à jour les informations d'un utilisateur existant.
+Cela aide à rendre votre code plus clair et à éviter les erreurs.
+
+Sécurité: Il est important de sécuriser les mots de passe des utilisateurs en les hashant et en les salant avant de les stocker dans la base de données, comme vous l'avez fait dans votre modèle User. Vous pouvez également utiliser des fonctions de validation pour les entrées utilisateur afin de vous assurer que les données envoyées sont correctes et sûres.

@@ -1,23 +1,15 @@
 <?php
 require_once __DIR__ . '/../models/Database.php';
 require_once __DIR__ . '/../models/User.php';
-
-ini_set('display_errors', 1);
-ini_set('display_startup_errors', 1);
-error_reporting(E_ALL);
+require_once __DIR__ . '/../models/UserDAO.php';
 
 class AuthController
 {
-    private $userModel;
+    private $userDAO;
 
     public function __construct($pdo)
     {
-        $this->userModel = new User($pdo);
-    }
-
-    public function isLoggedIn()
-    {
-        return isset($_SESSION['id_user']);
+        $this->userDAO = new UserDAO($pdo);
     }
 
     public function registerController()
@@ -36,7 +28,7 @@ class AuthController
             $interests = $_POST['interests'];
 
             // Inscription de l'utilisateur
-            $result = $this->userModel->register($email, $first_name, $last_name, $password, $promo, $statut, $bio, $birth_date, $profile_picture, $interests);
+            $result = $this->userDAO->register($email, $first_name, $last_name, $password, $promo, $statut, $bio, $birth_date, $profile_picture, $interests);
             if ($result) {
                 // Rediriger vers la page de connexion
                 $params = array('page' => 'login');
@@ -55,7 +47,7 @@ class AuthController
             $email = $_POST['email'];
             $password = $_POST['password'];
 
-            $user = $this->userModel->login($email, $password);
+            $user = $this->userDAO->login($email, $password);
             if ($user) {
                 session_start();
 
@@ -70,6 +62,21 @@ class AuthController
                 echo "Identifiants incorrects.";
             }
         }
+    }
+    public function showLogin()
+    {
+        require_once 'app/views/auth/login.php';
+    }
+
+    public function showRegister()
+    {
+        require_once 'app/views/auth/register.php';
+    }
+
+
+    public function isLoggedIn()
+    {
+        return isset($_SESSION['id_user']);
     }
 
 }

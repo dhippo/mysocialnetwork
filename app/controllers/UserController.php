@@ -4,7 +4,7 @@ class UserController
 {
     private $userModel;
 
-    public function __construct($pdo)
+/*    public function __construct($pdo)
     {
         $this->userModel = new User($pdo);
     }
@@ -29,6 +29,6 @@ class UserController
             'last_name' => $userInfo['last_name'],
             'profile_picture' => $userInfo['profile_picture'],
         ];
-    }
+    }*/
 
 }
