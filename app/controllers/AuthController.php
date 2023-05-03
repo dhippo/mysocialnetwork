@@ -1,38 +1,17 @@
 <?php
 require_once __DIR__ . '/../models/Database.php';
 require_once __DIR__ . '/../models/User.php';
-
-ini_set('display_errors', 1);
-ini_set('display_startup_errors', 1);
-error_reporting(E_ALL);
+require_once __DIR__ . '/../models/UserDAO.php';
 
 class AuthController
 {
-    private $userModel;
-    private $adminModel;
+    private $userDAO;
 
     public function __construct($pdo)
     {
-        $this->userModel = new User($pdo);
-        $this->adminModel = new Admin($pdo);
-
+        $this->userDAO = new UserDAO($pdo);
     }
 
-    public function isLoggedIn()
-    {
-        if (isset($_SESSION['id_user']) || isset($_SESSION['id_admin'])) {
-             return isset($_SESSION['id_user']);
-        } elseif(isset($_SESSION['id_admin'])) {
-            return $_SESSION['id_admin'];
-        }else{
-            return false;
-        };
-
-    }
-
-    /** *********************************************************************/
-    /** ******************            AUTH             *********************/
-    // case 'register':
     public function registerController()
     {
         if ($_SERVER['REQUEST_METHOD'] == 'POST') {
@@ -43,17 +22,15 @@ class AuthController
             $password = $_POST['password'];
             $promo = $_POST['promo'];
             $statut = $_POST['statut'];
+            $bio = 'vie nulle';
             $birth_date = $_POST['birth_date'];
-
-            // Valider le mot de passe
-            if (!$this->userModel->isPasswordValid($password)) {
-                echo "Le mot de passe doit contenir au moins une majuscule, un chiffre et un caractère spécial.";
-                return;
-            }
+            $profile_picture = 'photo nulle';
+            $interests = 'interets nuls';
 
             // Inscription de l'utilisateur
-            $result = $this->userModel->register($email, $first_name, $last_name, $password, $promo, $statut, $birth_date);
+            $result = $this->userDAO->register($email, $first_name, $last_name, $password, $promo, $statut, $bio, $birth_date, $profile_picture, $interests);
             if ($result) {
+
                 // Rediriger vers la page de connexion
                 $params = array('page' => 'login');
                 $queryString = http_build_query($params);
@@ -65,46 +42,51 @@ class AuthController
         }
     }
 
-
-    // case 'login':
     public function loginController()
     {
         if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             $email = $_POST['email'];
             $password = $_POST['password'];
 
-            $user = $this->userModel->login($email, $password);
+            $userModel = $this->userDAO->login($email, $password);
 
-            if ($user) {
-                if ($user['validated'] == 1) {
-                    session_start();
-                    $_SESSION['id_user'] = $user['id_user'];
-                    $_SESSION['user_email'] = $user['email'];
-                    $params = array('page' => 'home');
-                    $queryString = http_build_query($params);
-                    header('Location: ' . $_SERVER['PHP_SELF'] . '?' . $queryString);
-                }
-                else {
-                    echo "Votre compte n'a pas encore été validé par un administrateur.";
-                }
+            if ($userModel){
+                // Créer une session
+                $_SESSION['id_user'] = $userModel->getId();
+                //Rediriger vers la page de home
+                $params = array('page' => 'home');
+                $queryString = http_build_query($params);
+                header('Location: ' . $_SERVER['PHP_SELF'] . '?' . $queryString);
             } else {
                 echo "Identifiants incorrects.";
             }
-
-            // Vérifier si l'utilisateur est également un administrateur
-            $admin = $this->adminModel->login($email, $password);
-            if ($admin) {
-                session_start();
-                $_SESSION['id_admin'] = $admin['id_admin'];
-                $_SESSION['admin_email'] = $admin['email'];
-                $params = array('page' => 'admin_validator');
-                $queryString = http_build_query($params);
-                header('Location: ' . $_SERVER['PHP_SELF'] . '?' . $queryString);
-            }
         }
+    }
+    public function showLogin()
+    {
+        require_once 'app/views/auth/login.php';
+    }
+
+    public function showRegister()
+    {
+        require_once 'app/views/auth/register.php';
+    }
+
+    public function isAuthenticated()
+    {
+        return isset($_SESSION['id_user']);
+    }
+
+    public function logout()
+    {
+        session_unset();
+        session_destroy();
     }
 
 
-
+    public function isLoggedIn()
+    {
+        return isset($_SESSION['id_user']);
+    }
 
 }

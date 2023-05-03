@@ -1,351 +1,70 @@
 <?php
-/** IMPORTER SESSION ET CACHES */
-ob_start();
 session_start();
+//print('$_SESSION=<pre>'.print_r($_SESSION, true).'</pre><br><br>');
 
-/** IMPORTER LES FONCTIONS DES CONTROLEURS ET MODÈLES DE MON APPLICATION */
 /** DATABASE */
 require_once 'app/models/Database.php';
 $pdo = new Database();
 $pdo_connection = $pdo->getConnection();
+
 /** MODELS */
+require_once 'app/models/UserDAO.php';
 require_once 'app/models/User.php';
 require_once 'app/models/Post.php';
-require_once 'app/models/Admin.php';
-require_once 'app/models/Message.php';
+
 /** CONTROLLERS */
-/* AuthController */
+/** AuthController */
 require_once 'app/controllers/AuthController.php';
 $authController = new AuthController($pdo_connection);
-/* UserController */
+/** UserController */
 require_once 'app/controllers/UserController.php';
 $userController = new UserController($pdo_connection);
-/* PostController */
+/** PostController */
 require_once 'app/controllers/PostController.php';
 $postController = new PostController($pdo_connection);
-/* AdminController */
-require_once 'app/controllers/AdminController.php';
-$adminController = new AdminController($pdo_connection);
 
 
-$requestedPage = isset($_GET['page']) ? $_GET['page'] : 'register'; //page de base si aucun argument, si un user est connecté, il sera redirigé vers la page home
+$requestedPage = isset($_GET['page']) ? $_GET['page'] : 'register'; //page de base si aucun argument
 
-/** condition test si l'utilisateur est l'utilisateur est connecté */
-if (!$authController->isLoggedIn() && !in_array($requestedPage, ['login', 'register','discu_user', 'search_user', 'search_user_frends'])) {
-    /** PAS CONNECTÉ  */
-    // Rediriger vers la page de connexion
-    $params = array('page' => 'login');
-    $queryString = http_build_query($params);
-    header('Location: ' . $_SERVER['PHP_SELF'] . '?' . $queryString);
-    exit;
-} else {
-
-    if(isset($_SESSION['id_user'])){
-        $userFullName = $userController->getUserNameById($_SESSION['id_user']);
-        $_SESSION['first_name'] = $userFullName['first_name'];
-        $_SESSION['last_name'] = $userFullName['last_name'];
-        $_SESSION['profile_picture'] = $userFullName['profile_picture'];
-    }
+if (isset($_SESSION['id_user'])) {
+    $userDAO = new UserDAO($pdo_connection);
+    $userModel = $userDAO->getUserById($_SESSION['id_user']);
 }
 
-
-/** FAIRE APPARAITRE LE HEADER (+ DASHBOARD) DANS TOUTES LES PAGES SAUF LOGIN ET REGISTER */
-// condition pour afficher le header: ne pas être sur la page de connexion ou d'inscription ou $_GET['page'] non défini
-if (!in_array($requestedPage, ['login', 'register','discu_user', 'search_user', 'search_user_frends'])) {
-    if(isset($_GET['page'])){
-
-        require_once 'app/views/layouts/header.php';
-    }
-}
-
-/** *********/
-/** ROUTER */
-/** *********************************************************************/
-/** ******************            AUTH             *********************/
 switch ($requestedPage) {
     case 'login':
-        $authController->loginController();
-
-        require_once 'app/views/auth/login.php';
+        if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+            $authController->loginController();
+        } else {
+            $authController->showLogin();
+        }
         break;
+
     case 'register':
-        $authController->registerController();
-        require_once 'app/views/auth/register.php';
+        if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+            $authController->registerController();
+        } else {
+            $authController->showRegister();
+        }
         break;
-    /** *********************************************************************/
-    /** ******************            HOME             *********************/
+
     case 'home':
-        $publicPosts = $postController->displayAllPublicPosts();
-        require_once 'app/views/home.php';
-        break;
-
-
-    /** *********************************************************************/
-    /** ******************            ADMIN             *********************/
-    case 'admin_all_users':
-        $idADMIN = 11;
-        if($_SESSION['id_user'] == $idADMIN){
-            $allUsers = $userController->displayAllUsersWithFilter('');
-            require_once 'app/views/admin/admin_validator.php';
-            break;
-        }
-        break;
-    case 'admin_new_users':
-        $filter = "is_blocked = 0 AND validated = 0";
-        $allUsers = $userController->displayAllUsersWithFilter($filter);
-        require_once 'app/views/admin/admin_validator.php';
-        break;
-    case 'admin_validated_users':
-        $filter = "is_blocked = 0 AND validated = 1";
-        $allUsers = $userController->displayAllUsersWithFilter($filter);
-        require_once 'app/views/admin/admin_validator.php';
-        break;
-    case 'admin_blocked_users':
-        $filter = "is_blocked = 1 AND validated = 0";
-        $allUsers = $userController->displayAllUsersWithFilter($filter);
-        require_once 'app/views/admin/admin_validator.php';
-        break;
-    case 'admin_suspended_users':
-        $filter = "is_blocked = 0 AND validated = 0";
-        $allUsers = $userController->displayAllUsersWithFilter($filter);
-        require_once 'app/views/admin/admin_validator.php';
-        break;
-    case 'admin_validate_user':
-        $action = $_GET['action'];
-        $idUser = $_GET['id'];
-        $adminController->validateUser($idUser, $action);
-        header('Location: http://localhost:8888/mysocialnetwork/router.php?page=admin_validator');
-        break;
-    case 'admin_block_user':
-        $action = $_GET['action'];
-        $idUser = $_GET['id'];
-        $adminController->blockUser($idUser, $action);
-        header('Location: http://localhost:8888/mysocialnetwork/router.php?page=admin_validator');
-        break;
-
-
-
-    /** ***********************************************************************/
-    /** ******************      NOTIFICATION          *************************/
-    case 'notifs':
-        $notifications = $userController->displayMyNotifications();
-        require_once 'app/views/notifications/my_notifs.php';
-        break;
-
-
-    /** ***********************************************************************/
-    /** ******************            PROFILE          ***********************/
-    case 'feed':
-        $friendsPosts = $postController->displayFriendsPosts();
-        require_once 'app/views/posts/feed.php';
-        break;
-    case 'profile':
-        $id_user = $_SESSION['id_user'];
-        $userInfo = $userController->displayMyProfile();
-        $userPosts = $postController->postsCurrentUser($id_user);
-
-        $myFriends = $userController->displayMyFriends();
-
-        require_once 'app/views/profiles/my_profile.php';
-        break;
-    case 'user_profile':
-        if (isset($_GET['email_user_to_see']) && !empty($_GET['email_user_to_see'])) {
-            $email_user_to_see = $_GET['email_user_to_see'];
-
-            $userModel = new User($pdo_connection);
-            $id_user_to_see = $userModel->getIdByEmail($email_user_to_see);
-            $userPosts = $postController->postsCurrentUser($id_user_to_see);
-
-            $areFriends = $userController->areFriends($_SESSION['id_user'], $id_user_to_see);
-
-
-
-            $userProfileInfo = $userController->getUserProfileByEmail($email_user_to_see);
-            $userProfileId = $userController->getUserIdByEmail($email_user_to_see);
-            require_once 'app/views/profiles/user_profile.php';
+        if ($authController->isAuthenticated()) {
+            require_once 'app/views/layouts/header.php';
+            require_once 'app/views/home.php';
         } else {
-            header('Location: ?page=home');
+            header('Location: ' . $_SERVER['PHP_SELF'] . '?page=login');
+            exit;
         }
-        break;
-    case 'modif_profile':
-        $user_id = $_SESSION['id_user'];
-        $userInfo = $userController->displayMyProfile($user_id);
-        if (isset($_POST['submit'])) {
-            $old_profile_picture = $userInfo['profile_picture'];
-            if ($userController->updateMyProfile($user_id, $_POST, $_FILES, $old_profile_picture)) {
-                header('Location: ?page=profile');
-                exit();
-            } else {
-                echo "Erreur lors de la mise à jour du profil.";
-            }
-        }
-        require_once 'app/views/profiles/modif_profile.php';
-        break;
-
-
-    /** ***********************************************************************/
-    /** ******************            POSTS          *************************/
-    case 'show_post':
-        if (isset($_GET['id_post']) && !empty($_GET['id_post'])) {
-            $id_post = $_GET['id_post'];
-            $postDetails = $postController->displayPostDetails($id_post);
-            require_once 'app/views/posts/show.php';
-        } else {
-            header('Location: ?page=home');
-        }
-        break;
-    case 'create':
-        if ($authController->isLoggedIn()) {
-            if (isset($_POST['submit'])) {
-                $result = $postController->createPost($_POST, $_FILES, $_SESSION['id_user']);
-                if ($result) {
-                    header('Location: ?page=home');
-                    exit();
-                } else {
-                    echo "<script>alert('Erreur lors de la création du post')</script>";
-                }
-            }
-            require_once 'app/views/posts/create.php';
-        } else {
-            header('Location: ?page=login');
-            exit();
-        }
-        break;
-    case 'edit_post':
-        if (isset($_GET['id_post']) && !empty($_GET['id_post'])) {
-            $id_post = $_GET['id_post'];
-
-            $postInfo = $postController->displayPostDetails($id_post);
-            $old_image = $postInfo['image'];
-            if (isset($_POST['submit'])) {
-                if ($postController->updatePostController($id_post, $_POST, $_FILES, $old_image)) {
-                    header('Location: ?page=home');
-                    exit();
-                } else {
-                    echo "Erreur lors de la mise à jour du post.";
-                }
-            } elseif (isset($_POST['delete'])) {
-                if ($postController->deletePostController($id_post)) {
-                    header('Location: ?page=home');
-                    exit();
-                } else {
-                    echo "Erreur lors de la suppression du post.";
-                }
-            }
-            require_once 'app/views/posts/edit.php';
-        } else {
-            var_dump($_GET['id_post']);
-        }
-        break;
-
-
-    /** ***********************************************************************/
-    /** ******************            LIKES          *************************/
-    case 'add_like':
-        if (isset($_GET['id_post']) && !empty($_GET['id_post'])) {
-            $id_post = $_GET['id_post'];
-            $postDetails = $postController->displayPostDetails($id_post);
-            $postController->addLikeController($id_post);
-
-
-            require_once 'app/views/posts/show.php';
-        } else {
-            header('Location: ?page=home');
-        }
-        break;
-    case 'add_dislike':
-        if (isset($_GET['id_post']) && !empty($_GET['id_post'])) {
-            $id_post = $_GET['id_post'];
-            $postDetails = $postController->displayPostDetails($id_post);
-
-            $postController->addDislikeController($id_post);
-            require_once 'app/views/posts/show.php';
-        } else {
-            header('Location: ?page=home');
-        }
-        break;
-
-
-
-    /** ***********************************************************************/
-    /** ******************            FRIENDS          *************************/
-    case 'ask_friend':
-        $userController->addFriendController();
-        break;
-    case 'add_friend':
-        if (isset($_GET['notif_id']) && !empty($_GET['notif_id'])) {
-            $userController->acceptFriendRequest($_GET['notif_id']);
-        } else {
-            header('Location: ?page=home');
-        }
-        break;
-    case 'refuse_friend':
-        if (isset($_GET['notif_id']) && !empty($_GET['notif_id'])) {
-            $userController->refuseFriendRequest($_GET['notif_id']);
-        } else {
-            header('Location: ?page=home');
-        }
-        break;
-
-
-    /** ***********************************************************************/
-    /** ******************        RELATIONS          *************************/
-/*    case 'all_users':
-        $id_u = $_SESSION['id_user'];
-        $allUsers = $userController->displayAllUsers();
-        require_once 'app/views/relations/all_users.php';
-        break;
-    case 'search_user':
-        $userController->searchUserController();
-        break;*/
-    case 'all_users':
-
-        $id_u = $_SESSION['id_user'];
-
-        $allUsers = $userController->displayAllUsers();
-        require_once 'app/views/relations/all_users.php';
-        break;
-    case 'message':
-
-        $allUsers = $userController->displayAllUsers();
-        require_once 'app/views/messages/inbox.php';
-
-        break;
-    case 'search_user':
-        $userController->searchUserController();
-        break;
-    case 'discu_user':
-        $userController->discu_live();
-        break;
-    case 'search_user_frends':
-        $userController->searchUserFrendsController();
-        break;
-
-    /** *********************************************************************/
-    /** ******************            HOME             *********************/
-    case 'home':
-        $publicPosts = $postController->displayAllPublicPosts();
-        require_once 'app/views/home.php';
-        break;
-    case 'waiter':
-        echo'<h1 class="text-5xl>WaiterWaiterWaiterWaiterWaiter</h1>"';
-            echo'<h1 class="text-5xl>WaiterWaiterWaiterWaiterWaiter</h1>"';
-            echo'<h1 class="text-5xl>WaiterWaiterWaiterWaiterWaiter</h1>"';
-            echo'<h1 class="text-5xl>WaiterWaiterWaiterWaiterWaiter</h1>"';
-            echo'<h1 class="text-5xl>WaiterWaiterWaiterWaiterWaiter</h1>"';
-            echo'<h1 class="text-5xl>WaiterWaiterWaiterWaiterWaiter</h1>"';
-        break;
-
-    case 'points':
-        require_once 'app/views/points_of_interest/index.php';
         break;
     case 'logout':
-        session_destroy();
-        header('Location: http://localhost:8888/mysocialnetwork/router.php?page=login');
-        break;
+        $authController->logout();
+        header('Location: ' . $_SERVER['PHP_SELF'] . '?page=login');
+        exit;
+
     default:
         http_response_code(404);
         echo "Page non trouvée";
         break;
 }
-ob_end_flush();
+

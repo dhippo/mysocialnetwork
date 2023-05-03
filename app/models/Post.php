@@ -32,6 +32,8 @@ class Post
         $stmt->execute(['email' => '%' . $email]);
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
+
+
     public function getFriendsPosts($friendsEmails)
     {
         // Vérifier si le tableau $friendsEmails est vide

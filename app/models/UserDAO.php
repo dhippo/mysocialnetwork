@@ -11,7 +11,7 @@ class UserDAO
 
     public function register($email, $first_name, $last_name, $password, $promo, $statut, $bio, $birth_date, $profile_picture, $interests)
     {
-        $password = password_hash($password, PASSWORD_DEFAULT);
+        //$password = password_hash($password, PASSWORD_DEFAULT);
         $validated = 0;
         $is_blocked = 0;
 
@@ -45,10 +45,28 @@ class UserDAO
 
         $data = $stmt->fetch(PDO::FETCH_ASSOC);
 
-        if ($data && password_verify($password, $data['password'])) {
+        if ($data && $password === $data['password']) {
             return new User($data);
         } else {
             return false;
         }
     }
+
+    public function getUserById($id_user)
+    {
+        $sql = "SELECT * FROM users WHERE id_user = :id_user";
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->bindParam(':id_user', $id_user);
+        $stmt->execute();
+
+        $data = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        if ($data) {
+            return new User($data);
+        } else {
+            return false;
+        }
+    }
+
+
 }
